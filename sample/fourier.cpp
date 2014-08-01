@@ -185,6 +185,8 @@ main(int argc, char *argv[])
   while(1) {
     int c = waitKey(10);
     switch((char)c) {
+		case default:
+			waitKey();
     case '\x1b': // exit
       return 0;
     case 'a': // IDFT all

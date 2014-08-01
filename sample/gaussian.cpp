@@ -5,7 +5,7 @@
 int
 main(int argc, char *argv[])
 {
-  cv::Mat src_img = cv::imread("../level1_sample3.png", 1);
+  cv::Mat src_img = cv::imread("../ref/Level1/level1_sample3.png", 1);
   if(src_img.empty()) return -1; 
   
   cv::Mat dst_img1, dst_img2;

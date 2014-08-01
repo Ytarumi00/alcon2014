@@ -12,25 +12,38 @@ Re_img	fourier.cpp	/^  Mat Re_img, Im_img, Complex_img;$/;"	m	class:DftIdftApp	f
 calcIDFT	fourier.cpp	/^DftIdftApp::calcIDFT(bool all)$/;"	f	class:DftIdftApp
 calcMagImage	fourier.cpp	/^DftIdftApp::calcMagImage()$/;"	f	class:DftIdftApp
 clear	fourier.cpp	/^  void clear(){idft_img.setTo(0);}$/;"	f	class:DftIdftApp
+dft	fourier.py	/^dft = cv2.dft(np.float32(img),flags = cv2.DFT_COMPLEX_OUTPUT)$/;"	v
 dft_cols	fourier.cpp	/^  int src_cols, src_rows, dft_cols, dft_rows;$/;"	m	class:DftIdftApp	file:
 dft_dst	fourier.cpp	/^  Mat zero, dft_src, dft_dst, dft_dst_p;$/;"	m	class:DftIdftApp	file:
 dft_dst_p	fourier.cpp	/^  Mat zero, dft_src, dft_dst, dft_dst_p;$/;"	m	class:DftIdftApp	file:
 dft_rows	fourier.cpp	/^  int src_cols, src_rows, dft_cols, dft_rows;$/;"	m	class:DftIdftApp	file:
+dft_shift	fourier.py	/^dft_shift = np.fft.fftshift(dft)$/;"	v
 dft_src	fourier.cpp	/^  Mat zero, dft_src, dft_dst, dft_dst_p;$/;"	m	class:DftIdftApp	file:
 idft_img	fourier.cpp	/^  Mat idft_img;$/;"	m	class:DftIdftApp	file:
 idft_win	fourier.cpp	/^  string org_win, mag_win, idft_win;$/;"	m	class:DftIdftApp	file:
 img	denoising.py	/^img = cv2.imread("level1_sample1.png")$/;"	v
+img	fourier.py	/^img = cv2.imread('..\/fft1.jpg',0)$/;"	v
 mag_img	fourier.cpp	/^  Mat src_img, mag_img;$/;"	m	class:DftIdftApp	file:
 mag_win	fourier.cpp	/^  string org_win, mag_win, idft_win;$/;"	m	class:DftIdftApp	file:
+magnitude_spectrum	fourier.py	/^magnitude_spectrum = 20*np.log(cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1]))$/;"	v
 main	fourier.cpp	/^main(int argc, char *argv[])$/;"	f
+main	gaussian.cpp	/^main(int argc, char *argv[])$/;"	f
+main	hist.cpp	/^main (int argc, char **argv)$/;"	f
+main	hist2.cpp	/^int main( int argc, char** argv )$/;"	f
+main	hist3.cpp	/^int main(int argc, char* argv[])$/;"	f
 mv	fourier.cpp	/^  vector<Mat> mv;$/;"	m	class:DftIdftApp	file:
 nothing	denoising.py	/^def nothing(*arg):$/;"	f
+ob	closing.py	/^ob = cv.LoadImage("..\/ref\/Level1\/level1_sample3.png",cv.CV_LOAD_IMAGE_GRAYSCALE)$/;"	v
+obb	closing.py	/^obb = cv.CreateImage(size,8,1)$/;"	v
+obd	closing.py	/^obd = cv.CreateImage(size,8,1)$/;"	v
+obe	closing.py	/^obe = cv.CreateImage(size,8,1)$/;"	v
 onMouse	fourier.cpp	/^DftIdftApp::onMouse(int event, int x, int y, int flags, void* param)$/;"	f	class:DftIdftApp
 org_win	fourier.cpp	/^  string org_win, mag_win, idft_win;$/;"	m	class:DftIdftApp	file:
 shiftDFT	fourier.cpp	/^DftIdftApp::shiftDFT(Mat &src, Mat& dst)$/;"	f	class:DftIdftApp
 showIDFTImage	fourier.cpp	/^  void showIDFTImage(){imshow(idft_win, idft_img);}$/;"	f	class:DftIdftApp
 showMagImage	fourier.cpp	/^  void showMagImage(){imshow(mag_win, mag_img);}$/;"	f	class:DftIdftApp
 showOrgImage	fourier.cpp	/^  void showOrgImage(){imshow(org_win, src_img);}$/;"	f	class:DftIdftApp
+size	closing.py	/^size = cv.GetSize(ob)$/;"	v
 src_cols	fourier.cpp	/^  int src_cols, src_rows, dft_cols, dft_rows;$/;"	m	class:DftIdftApp	file:
 src_img	fourier.cpp	/^  Mat src_img, mag_img;$/;"	m	class:DftIdftApp	file:
 src_rows	fourier.cpp	/^  int src_cols, src_rows, dft_cols, dft_rows;$/;"	m	class:DftIdftApp	file:
