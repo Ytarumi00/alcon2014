@@ -23,6 +23,21 @@ void cvArrow(Mat& img, Point pt1, Point pt2, Scalar color, int thickness=1, int 
     line(img,pt2,ptl,color,thickness,lineType,shift);
     line(img,pt2,ptr,color,thickness,lineType,shift);
 }
+void ComplementShadow(Mat shadow,vector<Point> contour,vector<Point> nvec){
+}
+void makeShadowMask(Mat& smask, Point pt, double rad, float w = 100){
+	if(sin(rad)<0)
+		return;
+	else{
+		if(cos(rad) >= 0){
+			for(int y = 0; y < (int)smask.rows; y++){
+				for(int x = 0; x < (int)smask.cols; x++){
+					smask.data[smask.cols*(pt.y+y)+pt.x+x] = 255;
+				}
+			}
+		}
+	}
+}
 int main( int argc, char** argv )
 {    Mat src;
 	Mat _src;
@@ -31,12 +46,13 @@ int main( int argc, char** argv )
 
 	// the first command-line parameter must be a filename of the binary (black-n-white) image
 
-//  src=imread("../ref/Level1/reference_sample.png");
-//  _src=imread("../ref/Level1/reference_sample.png", 1);
-  src=imread("../ref/tmp/shadow_img.png");
-  _src=imread("../ref/tmp/shadow_img.png", 1);
-	Mat dst = src;
+	src=imread("../ref/Level1/reference_sample.png");
+	_src=imread("../ref/Level1/reference_sample.png", 1);
+	Mat shadow = imread("../ref/tmp/shadow_img.png",0); //グレースケール入力
+	Mat com_shadow = shadow.clone();
+	Mat dst = src.clone();
 	Mat mask=Mat::zeros(src.rows, src.cols, CV_8UC3);
+	Mat shadow_mask = Mat::zeros(shadow.rows, shadow.cols, CV_8U);
 	cvtColor(src, src_gray, CV_BGR2GRAY);
 	threshold(src_gray,src,80,255,CV_THRESH_BINARY);
 	//Canny(src,src,100,500);
@@ -48,7 +64,6 @@ int main( int argc, char** argv )
 	Scalar color( 255, 0, 0 );
 	cout<<contours.size()<<"\n";
 	int num=contours.size();
-
 	int contoursID;
 	for( int idx=0; idx <num; idx++ )
 	{   double area=contourArea(contours[idx]);
@@ -67,7 +82,10 @@ int main( int argc, char** argv )
 	double radian;
 	Scalar linecolor(0,0,200);
 	int linelength=30,thickness=1,lineType=1,Shift=0;
+	vector<Point> nvec;
+	vector<double> nrad;
 
+	//法線ベクトルの算出
 	for(int i = 0; i < contours[contoursID].size(); i++){
 		if(i != contours[contoursID].size()-1){
 			radian = atan2(contours[contoursID][i+1].y-contours[contoursID][i].y,contours[contoursID][i+1].x-contours[contoursID][i].x);
@@ -77,13 +95,54 @@ int main( int argc, char** argv )
 		if(radian>=0)
 		{
 			cvArrow(dst,contours[contoursID][i],Point(contours[contoursID][i].x+linelength*cos(radian+M_PI/2),contours[contoursID][i].y+linelength*sin(radian+M_PI/2)),linecolor,thickness,lineType,Shift );
+			nvec.push_back(Point(contours[contoursID][i].x+linelength*cos(radian+M_PI/2),contours[contoursID][i].y+linelength*sin(radian+M_PI/2)));
+			nrad.push_back(radian+M_PI/2);
 		}
 		else{
 			cvArrow(dst,contours[contoursID][i],Point(contours[contoursID][i].x+linelength*cos(radian-M_PI/2),contours[contoursID][i].y+linelength*sin(radian-M_PI/2)),linecolor,thickness,lineType,Shift );
+			nvec.push_back(Point(contours[contoursID][i].x+linelength*cos(radian-M_PI/2),contours[contoursID][i].y+linelength*sin(radian-M_PI/2)));
+			nrad.push_back(radian-M_PI/2);
 		}
 //    line(dst,contours[contoursID][i],Point(contours[contoursID][i].x+50*cos(radian),contours[contoursID][i].y+50*sin(radian)),Scalar(0,0,200),3,4 );
 	}
+	int flag = 0;
+	int shadowlen = 100;
+	for(int i = 0; i < contours[contoursID].size(); i++){
+		//8近傍探索
+		flag = 0;
+		for(int j = -1; j < 1; j++){
+			for(int h = -1; h < 1; h++){
+//        if(shadow.at<uchar>(contours[contoursID][i].y+h,contours[contoursID][i].x+j)<128){
+				if(shadow.data[shadow.cols*(contours[contoursID][i].y+h)+contours[contoursID][i].x+j]<128){
+					flag = 1;
+				}
+			}
+		}
+		if(flag == 1){
+//      for(int j = 0; j < (int)shadowlen*sin(nrad[i]);j++){
+//        for(int h = 0; h < (int)shadowlen*cos(nrad[i]);h++){
+			for(int j = -10; j < 10;j++){
+				for(int h = -10; h < 10;h++){
+					shadow_mask.data[shadow_mask.cols*(contours[contoursID][i].y+j)+contours[contoursID][i].x+h]=255;
+				}
+			}
+		}
+	}
+	for(int y = 0; y < com_shadow.cols; y++){//横
+		for(int x = 0; x < com_shadow.rows; x++){//縦
+			if(shadow_mask.data[y*shadow_mask.cols+x] == 255){
+				com_shadow.data[y*shadow_mask.cols+x]=0;
+			}
+		}
+	}
 	namedWindow("dst",1);
 	imshow("dst",dst);
+	namedWindow("shadow");
+	imshow("shadow",shadow);
+	namedWindow("complemnt_shadow",WINDOW_NORMAL);
+	imshow("complemnt_shadow",com_shadow);
+	namedWindow("shadow_mask");
+	imshow("shadow_mask",shadow_mask);
 	waitKey(0);
 }
+
