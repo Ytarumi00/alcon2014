@@ -8,28 +8,31 @@ using namespace std;
 
 int main( int argc, char** argv )
 {    Mat src;
-	Mat shadow = imread("../ref/tmp/shadow_img.png",0); //グレースケール入力
+	Mat shadow = imread("../ref/tmp/scenario6_reference_shadow.png",0); //グレースケール入力
+//  Mat shadow = imread("../ref/tmp/shadow_img.png",0); //グレースケール入力
 	Mat binImg;
 	threshold(shadow,binImg,200,255,THRESH_BINARY);
 	Mat bin_org = binImg.clone();
 
 	//
-	dilate(binImg,binImg,cv::Mat(),Point(-1,1),6);
-	erode(binImg,binImg,cv::Mat(),Point(-1,1),6);
-	erode(binImg,binImg,cv::Mat(),Point(-1,1),6);
-	dilate(binImg,binImg,cv::Mat(),Point(-1,1),6);
+	erode(binImg,binImg,cv::Mat(),Point(-1,1),8);
+	dilate(binImg,binImg,cv::Mat(),Point(-1,1),8);
+	dilate(binImg,binImg,cv::Mat(),Point(-1,1),8);
+	erode(binImg,binImg,cv::Mat(),Point(-1,1),8);
 
+	Mat _binImg = binImg.clone();
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
-	findContours( binImg, contours, hierarchy,CV_RETR_TREE, CV_CHAIN_APPROX_NONE );
+	findContours( _binImg, contours, hierarchy,CV_RETR_TREE, CV_CHAIN_APPROX_NONE );
 	Scalar color(255,255,0);
 	Mat contour_mask = Mat::zeros(binImg.rows,binImg.cols,CV_8UC3);
-	int contoursID = 1;
+//  int contoursID  = 1;
+	int contoursID  = 3;
 
 	cout << "contours.size: " << contours.size() << endl;
 	cout << "contoursID: " << contoursID << endl;
 	//  drawContours( contour_mask, contours, contourID, color,-1, 8);
-	drawContours( contour_mask, contours, 1, color,-1, 8);
+	drawContours( contour_mask, contours, contoursID, color,-1, 8);
 
 	vector<double> nrad;
 	double radian;
@@ -48,15 +51,22 @@ int main( int argc, char** argv )
 		}
 		//    line(dst,contours[contoursID][i],Point(contours[contoursID][i].x+50*cos(radian),contours[contoursID][i].y+50*sin(radian)),Scalar(0,0,200),3,4 );
 	}
-	double diff = 0;
-	for(int i = 0; i < nrad.size(); i++){
-		if(i == 0)
-			diff += nrad[0]-nrad[nrad.size()];
-		else
-			diff += nrad[i]-nrad[i-1];
-	}
-	double complexity = diff/nrad.size();
-	cout << "complexity: " << complexity << endl;
+	//  法線ベクトルによる複雑度
+//  double diff = 0;
+//  for(int i = 0; i < nrad.size(); i++){
+//    if(i == 0)
+//      diff += nrad[0]-nrad[nrad.size()];
+//    else
+//      diff += nrad[i]-nrad[i-1];
+//  }
+//  double complexity = diff/nrad.size();
+//  cout << "complexity: " << complexity << endl;
+	
+	RotatedRect box = fitEllipse(contours[contoursID]);
+	ellipse(binImg,box,Scalar(0,0,255),2,8);
+
+	cout << "contours_area: " << contourArea(contours[contoursID]) << " ellipse: " << box.size.area() << endl;
+	cout << "complexity: " << contourArea(contours[contoursID])/box.size.area() << endl;
 	namedWindow("contour_mask",WINDOW_NORMAL);
 	imshow("contour_mask",contour_mask);
 	namedWindow("shadow",WINDOW_NORMAL);
