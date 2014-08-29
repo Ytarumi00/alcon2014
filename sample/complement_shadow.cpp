@@ -25,19 +25,32 @@ void cvArrow(Mat& img, Point pt1, Point pt2, Scalar color, int thickness=1, int 
 }
 void ComplementShadow(Mat shadow,vector<Point> contour,vector<Point> nvec){
 }
-void makeShadowMask(Mat& smask, Point pt, double rad, float w = 100){
+void makeShadowMask(Mat& smask, Point pt, double rad, float w = 50){
+//    for(int j = -5; j < 5;j++){
+//      for(int h = -5; h < 5;h++){
+//        smask.data[smask.cols*(pt.y+j)+pt.x+h]=255;
+//      }
+//    }
 	if(sin(rad)<0)
 		return;
 	else{
 		if(cos(rad) >= 0){
-			for(int y = 0; y < (int)smask.rows; y++){
-				for(int x = 0; x < (int)smask.cols; x++){
-					smask.data[smask.cols*(pt.y+y)+pt.x+x] = 255;
+			for(int y = 0; y < (int)w*sin(rad); y++){
+				for(int x = 0; x < (int)w*cos(rad); x++){
+					smask.data[smask.cols*(pt.y-y)+pt.x+x] = 255;
+				}
+			}
+		}
+		else{
+			for(int y = 0; y < (int)w*sin(rad); y++){
+				for(int x = 0; x > (int)w*cos(rad); x--){
+					smask.data[smask.cols*(pt.y-y)+pt.x+x] = 255;
 				}
 			}
 		}
 	}
 }
+
 int main( int argc, char** argv )
 {    Mat src;
 	Mat _src;
@@ -76,8 +89,8 @@ int main( int argc, char** argv )
 	}
 	_src.copyTo(result,mask);
 	//threshold(_src,_src,80,255,CV_THRESH_BINARY);
-	namedWindow( "Components", 1 );
-	imshow( "Components",result);
+//  namedWindow( "Components", 1 );
+//  imshow( "Components",result);
 
 	double radian;
 	Scalar linecolor(0,0,200);
@@ -90,7 +103,6 @@ int main( int argc, char** argv )
 		if(i != contours[contoursID].size()-1){
 			radian = atan2(contours[contoursID][i+1].y-contours[contoursID][i].y,contours[contoursID][i+1].x-contours[contoursID][i].x);
 		}
-		cout << contours[contoursID][i] << radian / 180 * M_PI << endl;
 		//radian>0なら+90,radian<0なら-90度
 		if(radian>=0)
 		{
@@ -121,11 +133,12 @@ int main( int argc, char** argv )
 		if(flag == 1){
 //      for(int j = 0; j < (int)shadowlen*sin(nrad[i]);j++){
 //        for(int h = 0; h < (int)shadowlen*cos(nrad[i]);h++){
-			for(int j = -10; j < 10;j++){
-				for(int h = -10; h < 10;h++){
-					shadow_mask.data[shadow_mask.cols*(contours[contoursID][i].y+j)+contours[contoursID][i].x+h]=255;
-				}
-			}
+//      for(int j = -5; j < 5;j++){
+//        for(int h = -5; h < 5;h++){
+//          shadow_mask.data[shadow_mask.cols*(contours[contoursID][i].y+j)+contours[contoursID][i].x+h]=255;
+//        }
+//      }
+			makeShadowMask(shadow_mask,contours[contoursID][i],nrad[i]);
 		}
 	}
 	for(int y = 0; y < com_shadow.cols; y++){//横
@@ -141,7 +154,7 @@ int main( int argc, char** argv )
 	imshow("shadow",shadow);
 	namedWindow("complemnt_shadow",WINDOW_NORMAL);
 	imshow("complemnt_shadow",com_shadow);
-	namedWindow("shadow_mask");
+	namedWindow("shadow_mask",WINDOW_NORMAL);
 	imshow("shadow_mask",shadow_mask);
 	waitKey(0);
 }

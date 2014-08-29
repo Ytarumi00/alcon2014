@@ -52,21 +52,21 @@ int main( int argc, char** argv )
 		//    line(dst,contours[contoursID][i],Point(contours[contoursID][i].x+50*cos(radian),contours[contoursID][i].y+50*sin(radian)),Scalar(0,0,200),3,4 );
 	}
 	//  法線ベクトルによる複雑度
-//  double diff = 0;
-//  for(int i = 0; i < nrad.size(); i++){
-//    if(i == 0)
-//      diff += nrad[0]-nrad[nrad.size()];
-//    else
-//      diff += nrad[i]-nrad[i-1];
-//  }
-//  double complexity = diff/nrad.size();
-//  cout << "complexity: " << complexity << endl;
+	double diff = 0;
+	for(int i = 0; i < nrad.size(); i++){
+		if(i == 0)
+			diff += abs(nrad[0]-nrad[nrad.size()]);
+		else
+			diff += abs(nrad[i]-nrad[i-1]);
+	}
+	double complexity = diff/nrad.size();
+	cout << "complexity by vec: " << complexity << endl;
 	
 	RotatedRect box = fitEllipse(contours[contoursID]);
 	ellipse(binImg,box,Scalar(0,0,255),2,8);
 
 	cout << "contours_area: " << contourArea(contours[contoursID]) << " ellipse: " << box.size.area() << endl;
-	cout << "complexity: " << contourArea(contours[contoursID])/box.size.area() << endl;
+	cout << "complexity by area: " << contourArea(contours[contoursID])/box.size.area() << endl;
 	namedWindow("contour_mask",WINDOW_NORMAL);
 	imshow("contour_mask",contour_mask);
 	namedWindow("shadow",WINDOW_NORMAL);
